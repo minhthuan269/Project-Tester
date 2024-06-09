@@ -69,6 +69,7 @@ class Calculator {
 
     else if (this.option === 'memoryRecall') {
       this.result.value = this.memoryValue;
+      this.newNumber = true;
     }
 
     else if (this.option === 'memoryMinus') {
