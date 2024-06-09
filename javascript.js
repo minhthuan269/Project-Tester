@@ -1,7 +1,5 @@
-
 class Calculator {
   constructor() {
-    
     this.result = document.querySelector('.calculator-screen-two');
     this.subRes = document.querySelector('.calculator-screen-one');
     this.numbers = [...document.querySelectorAll('[data-number]')];
@@ -24,9 +22,7 @@ class Calculator {
   }
 
   addNumber = (e) => {
-
     if(this.reset) this.clear();
-    
     this.number = e.target.textContent;
 
     if(this.result.value === '0') this.result.value = this.number;
@@ -41,29 +37,36 @@ class Calculator {
     this.lastChar = this.result.value[this.result.value.length - 1];
     
     if(this.option === 'dot') {
-      (this.lastChar === '.' || this.result.value.indexOf('.') !== -1) 
-        ? this.result.value
-        : this.result.value += '.';
+      if (this.lastChar !== '.' && this.result.value.indexOf('.') === -1) {
+        this.result.value += '.';
+      }
     }
     
-    else if(this.option === 'clearEntry') this.result.value = '0';
+    else if(this.option === 'clearEntry') {
+      this.result.value = '0';
+    }
     
-    else if(this.option === 'clear') this.clear();
+    else if(this.option === 'clear') {
+      this.clear();
+    }
     
-    else if(this.option === 'reverse') this.result.value = this.result.value * -1;
+    else if(this.option === 'reverse') {
+      this.result.value = this.result.value * -1;
+    }
 
     else if(this.option === 'undo') {
-
-      (this.result.value.length === 1) 
-        ? this.result.value = '0' 
-        : this.result.value = this.result.value.substring(0, this.result.value.length - 1);
+      if (this.result.value.length === 1) {
+        this.result.value = '0';
+      } else {
+        this.result.value = this.result.value.substring(0, this.result.value.length - 1);
+      }
     }
 
     else if (this.option === 'memoryPlus') {
       var currentValue = parseFloat(this.result.value);
       if (!isNaN(currentValue)) {
         this.memoryValue += currentValue;
-        this.memoryHistory.push(currentValue); // Lưu giá trị vào lịch sử bộ nhớ
+        this.memoryHistory.push(currentValue); 
       }
     }
 
@@ -76,7 +79,7 @@ class Calculator {
       var currentValue = parseFloat(this.result.value);
       if (!isNaN(currentValue)) {
         this.memoryValue -= currentValue;
-        this.memoryHistory.push(-currentValue); // Lưu giá trị vào lịch sử bộ nhớ
+        this.memoryHistory.push(-currentValue); 
       }
     }
 
@@ -84,7 +87,7 @@ class Calculator {
       var currentValue = parseFloat(this.result.value);
       if (!isNaN(currentValue)) {
         this.memoryValue = currentValue;
-        this.memoryHistory.push(currentValue); // Lưu giá trị vào lịch sử bộ nhớ
+        this.memoryHistory.push(currentValue); 
       }
     }
 
@@ -94,123 +97,118 @@ class Calculator {
     }
 
     else if (this.option === 'memoryHistory') {
-      console.log(this.memoryHistory); // Hiển thị lịch sử bộ nhớ trong console.log
+      console.log(this.memoryHistory);
     }
   }
   
-    calculate = (e) => {
-  
-      this.operator = e.target.dataset.operator;
-      this.value = Number(this.result.value);
-      this.subRes.style.visibility = 'visible';
-  
-      if(this.operator === 'pow') {
-        this.subRes.value = ` sqr(${this.result.value})`;
-        this.result.value = Math.pow(this.result.value, 2);
-      }
-  
-      else if(this.operator === 'sqrt') {
-        this.subRes.value = ` ${e.target.textContent}(${this.result.value})`;
-        this.result.value = Math.sqrt(this.result.value);
-      }
-  
-      else if(this.operator === 'fraction') {
-        this.subRes.value = ` 1/(${this.result.value})`;
-        this.result.value = 1 / this.result.value;
-      }
-  
-      else if(this.operator === 'percent') this.result.value = parseFloat(((this.currentResult * this.value) / 100).toPrecision(14));
-  
-      else {
-  
-        if(this.operator === 'equal' && this.newNumber && this.lastOperator !== null && this.lastOperator !== 'equal'){
-          
-          if(this.calculations.length > 2) 
+  calculate = (e) => {
+    this.operator = e.target.dataset.operator;
+    this.value = Number(this.result.value);
+    this.subRes.style.visibility = 'visible';
+
+    if(this.operator === 'pow') {
+      this.subRes.value = ` sqr(${this.result.value})`;
+      this.result.value = Math.pow(this.result.value, 2);
+    }
+
+    else if(this.operator === 'sqrt') {
+      this.subRes.value = ` ${e.target.textContent}(${this.result.value})`;
+      this.result.value = Math.sqrt(this.result.value);
+    }
+
+    else if(this.operator === 'fraction') {
+      this.subRes.value = ` 1/(${this.result.value})`;
+      this.result.value = 1 / this.result.value;
+    }
+
+    else if(this.operator === 'percent') {
+      this.result.value = parseFloat(((this.currentResult * this.value) / 100).toPrecision(14));
+    }
+
+    else {
+      if(this.operator === 'equal' && this.newNumber && this.lastOperator !== null && this.lastOperator !== 'equal'){
+        if(this.calculations.length > 2) {
           this.value = this.calculations.map(item => item).reverse().find(item => typeof item === 'number');
-  
-          this.calculations = [this.currentResult, Calculations.returnOperator(this.lastOperator), this.value, Calculations.returnOperator(this.operator)];
-          
-          this.currentResult = Calculations.doMath(this.currentResult, this.value, this.lastOperator);
-          this.currentResult = (parseFloat(this.currentResult.toPrecision(14)));
-          
-          this.result.value = this.currentResult;
-          this.subRes.value = this.calculations.join(' ');
-  
-        } else {
-  
-          if(this.newNumber) {
-            this.lastOperator = this.operator;
-            this.calculations[this.calculations.length-1] = Calculations.returnOperator(this.operator);
-            this.subRes.value = this.calculations.join(' ');
-            this.reset = false;
-            return;
-          }
-          
-          (this.lastOperator === null) 
-            ? this.currentResult = this.value
-            : this.currentResult = Calculations.doMath(this.currentResult, this.value, this.lastOperator);
-           
-          (this.operator !== 'equal')
-            ? this.lastOperator = this.operator 
-            : this.reset = true;
-          
-          this.newNumber = true;
-          this.calculations.push(this.value);
-          this.calculations.push(Calculations.returnOperator(this.operator));
-  
-          this.currentResult = (parseFloat(this.currentResult.toPrecision(14)));
-          this.result.value = this.currentResult;
-  
-          this.subRes.value = this.calculations.join(' ');
         }
+        this.calculations = [this.currentResult, Calculations.returnOperator(this.lastOperator), this.value, Calculations.returnOperator(this.operator)];
+        this.currentResult = Calculations.doMath(this.currentResult, this.value, this.lastOperator);
+        this.currentResult = (parseFloat(this.currentResult.toPrecision(14)));
+        this.result.value = this.currentResult;
+        this.subRes.value = this.calculations.join(' ');
+
+      } else {
+        if(this.newNumber) {
+          this.lastOperator = this.operator;
+          this.calculations[this.calculations.length-1] = Calculations.returnOperator(this.operator);
+          this.subRes.value = this.calculations.join(' ');
+          this.reset = false;
+          return;
+        }
+        if(this.lastOperator === null) {
+          this.currentResult = this.value;
+        } else {
+          this.currentResult = Calculations.doMath(this.currentResult, this.value, this.lastOperator);
+        }
+        if(this.operator !== 'equal') {
+          this.lastOperator = this.operator;
+        } else {
+          this.reset = true;
+        }
+        this.newNumber = true;
+        this.calculations.push(this.value);
+        this.calculations.push(Calculations.returnOperator(this.operator));
+        this.currentResult = (parseFloat(this.currentResult.toPrecision(14)));
+        this.result.value = this.currentResult;
+        this.subRes.value = this.calculations.join(' ');
       }
     }
-  
-    clear = () => {
-      this.subRes.style.visibility = 'hidden';
-      this.result.value = '0';
-      this.subRes.value = '';
-      this.calculations = [];
-      this.newNumber = false;
-      this.reset = false;
-      this.lastOperator = null;
-      this.currentResult = 0;
-    }
   }
+
+  clear = () => {
+    this.subRes.style.visibility = 'hidden';
+    this.result.value = '0';
+    this.subRes.value = '';
+    this.calculations = [];
+    this.newNumber = false;
+    this.reset = false;
+    this.lastOperator = null;
+    this.currentResult = 0;
+  }
+}
     
 class Calculations {
-    static doMath(currentResult = null, value = null, operator = null) {
-      const operators = {
-        plus: (x, y) => x + y,
-        minus: (x, y) => x - y,
-        multiply: (x, y) => x * y,
-        divide: (x, y) => x / y,
-      };
-  
-      if (!operators[operator]) {
-        throw new Error(`Invalid operator: ${operator}`);
-      }
-  
-      return operators[operator](currentResult, value);
+  static doMath(currentResult = null, value = null, operator = null) {
+    const operators = {
+      plus: (x, y) => x + y,
+      minus: (x, y) => x - y,
+      multiply: (x, y) => x * y,
+      divide: (x, y) => x / y,
+    };
+
+    if (!operators[operator]) {
+      throw new Error(`Invalid operator: ${operator}`);
     }
-  
-    static returnOperator(operator = null) {
-      const operatorSymbols = {
-        plus: '+',
-        minus: '−',
-        multiply: '×',
-        divide: '÷',
-        equal: '=',
-      };
-  
-      if (!operatorSymbols[operator]) {
-        throw new Error(`Invalid operator: ${operator}`);
-      }
-  
-      return operatorSymbols[operator];
-    }
+
+    return operators[operator](currentResult, value);
   }
-  
-  document.addEventListener('DOMContentLoaded', () => {
-    new Calculator();
-  })
+
+  static returnOperator(operator = null) {
+    const operatorSymbols = {
+      plus: '+',
+      minus: '−',
+      multiply: '×',
+      divide: '÷',
+      equal: '=',
+    };
+
+    if (!operatorSymbols[operator]) {
+      throw new Error(`Invalid operator: ${operator}`);
+    }
+
+    return operatorSymbols[operator];
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  new Calculator();
+});
